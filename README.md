@@ -94,7 +94,7 @@ Block =
   | { id, type: 'text',    content }
   | { id, type: 'diagram', nodes, edges }          // shape matches React Flow
 
-DiagramNode = { id, position: {x,y}, data: { label, annotation? } }
+DiagramNode = { id, position: {x,y}, size?: {width,height}, data: { label, annotation? } }
 DiagramEdge = { id, source, target, label? }
 ```
 

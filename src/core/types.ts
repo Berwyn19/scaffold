@@ -29,6 +29,10 @@ export interface DiagramBlock {
 export interface DiagramNode {
   id: string;
   position: { x: number; y: number };
+  // Box dimensions in canvas units. Optional: when omitted the canvas falls
+  // back to auto-sizing from content. Set once the user resizes a box by hand,
+  // so the size survives a save and syncs to the agent.
+  size?: { width: number; height: number };
   data: {
     label: string;
     // Free-form note attached to a node. This is the Phase 4 payoff: the coding
