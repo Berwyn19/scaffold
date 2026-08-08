@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>phase0 canvas</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #1e1e1e;
+        font-family: system-ui, sans-serif;
+      }
+      #status {
+        position: fixed;
+        top: 8px;
+        left: 12px;
+        color: #888;
+        font-size: 12px;
+      }
+      svg {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+      }
+      .box {
+        fill: #2d2d3a;
+        stroke: #6b8afd;
+        stroke-width: 2;
+        rx: 6;
+      }
+      .label {
+        fill: #e8e8e8;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">connecting…</div>
+    <svg id="canvas"></svg>
+
+    <script>
+      const svg = document.getElementById("canvas");
+      const status = document.getElementById("status");
+      const NS = "http://www.w3.org/2000/svg";
+
+      const ws = new WebSocket(`ws://${location.host}`);
+
+      ws.onopen = () => (status.textContent = "connected — waiting for edits");
+      ws.onclose = () => (status.textContent = "disconnected");
+
+      // On every message, wipe and redraw all boxes from the received array.
+      // Full-redraw is fine at this scale and keeps the client dead simple.
+      ws.onmessage = (event) => {
+        const nodes = JSON.parse(event.data);
+        status.textContent = `connected — ${nodes.length} box(es)`;
+        svg.replaceChildren();
+        for (const n of nodes) drawBox(n);
+      };
+
+      function drawBox(n) {
+        const w = 120;
+        const h = 48;
+        const rect = document.createElementNS(NS, "rect");
+        rect.setAttribute("class", "box");
+        rect.setAttribute("x", n.x);
+        rect.setAttribute("y", n.y);
+        rect.setAttribute("width", w);
+        rect.setAttribute("height", h);
+        rect.setAttribute("rx", 6);
+        svg.appendChild(rect);
+
+        const text = document.createElementNS(NS, "text");
+        text.setAttribute("class", "label");
+        text.setAttribute("x", n.x + w / 2);
+        text.setAttribute("y", n.y + h / 2 + 5);
+        text.setAttribute("text-anchor", "middle");
+        text.textContent = n.label ?? n.id;
+        svg.appendChild(text);
+      }
+
+      // Optional reverse direction: click empty canvas to add a box locally,
+      // which round-trips through the server and back to all tabs.
+      svg.addEventListener("click", (e) => {
+        ws.send(JSON.stringify({ type: "add", x: e.offsetX, y: e.offsetY }));
+      });
+    </script>
+  </body>
+</html>
