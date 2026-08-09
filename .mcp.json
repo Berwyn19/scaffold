@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "scaffold": {
+      "command": "npx",
+      "args": ["tsx", "src/server/index.ts"]
+    }
+  }
+}

@@ -18,8 +18,9 @@ import {
   type ServerMessage,
 } from "@core/protocol.js";
 import type { Store } from "../store/Store.js";
+import type { Broadcaster } from "./Broadcaster.js";
 
-export class SyncServer {
+export class SyncServer implements Broadcaster {
   private readonly clients = new Set<WebSocket>();
   private readonly wss: WebSocketServer;
 

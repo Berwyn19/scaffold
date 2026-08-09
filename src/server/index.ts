@@ -1,25 +1,24 @@
-// Server boot.
+// Server entry point.
 //
-// The whole architecture hinges on ONE fact enforced here: the MCP tools and
-// the websocket server live in the same process, sharing one Store instance.
-// That shared memory is what lets a Claude edit (MCP) push instantly down the
-// sockets held by the canvas (sync). Split these into separate processes and
-// you would need external pub/sub to bridge them.
+// Phase 1: Claude Code spawns this over stdio as an MCP server. There is no
+// browser yet, so mutations go to the store and the broadcaster is a no-op.
+// Phase 2 adds the websocket SyncServer here and passes it as the broadcaster,
+// at which point the SAME tool code starts pushing edits to live canvases.
+//
+// stdout is the MCP protocol channel under stdio transport, so this file must
+// only ever write diagnostics to stderr.
 
 import { FileStore } from "./store/FileStore.js";
-import { SyncServer } from "./sync/SyncServer.js";
+import { noopBroadcaster } from "./sync/Broadcaster.js";
 import { DiagramTools } from "./mcp/tools.js";
+import { runStdioServer } from "./mcp/server.js";
 
-const WS_PORT = 3001;
-const STORE_PATH = "plan.json";
+const STORE_PATH = process.env.SCAFFOLD_STORE ?? "plan.json";
 
 const store = new FileStore(STORE_PATH);
-const sync = new SyncServer(store, WS_PORT);
-const tools = new DiagramTools(store, sync);
+const tools = new DiagramTools(store, noopBroadcaster);
 
-// `tools` is where Phase 1 hooks into the real MCP SDK. For now it exists so
-// the wiring (store -> sync -> tools) is exercised and typechecks.
-void tools;
-
-console.log(`scaffold server up: websocket on ws://localhost:${WS_PORT}`);
-console.log(`document persisted to ${STORE_PATH}`);
+runStdioServer(tools).catch((err) => {
+  console.error("scaffold MCP server failed to start:", err);
+  process.exit(1);
+});
