@@ -20,7 +20,7 @@ import type { DiagramTools } from "./tools.js";
 // Every tool returns the full document as pretty JSON, so the agent always sees
 // the current, complete state after its edit and can reason about what to do
 // next.
-function ok(document: Document): CallToolResult {
+function toToolResult(document: Document): CallToolResult {
   return {
     content: [{ type: "text", text: JSON.stringify(document, null, 2) }],
   };
@@ -46,7 +46,7 @@ export function createMcpServer(tools: DiagramTools): McpServer {
         "Get the full current planning document (all blocks, nodes, edges). Call this first to see what already exists before adding to it.",
       inputSchema: {},
     },
-    async () => ok(tools.getDocument())
+    async () => toToolResult(tools.getDocument())
   );
 
   server.registerTool(
@@ -67,7 +67,7 @@ export function createMcpServer(tools: DiagramTools): McpServer {
       },
     },
     async ({ id, label, x, y, annotation, blockId }) =>
-      ok(
+      toToolResult(
         tools.addNode(blockId, {
           id,
           position: { x, y },
@@ -90,7 +90,7 @@ export function createMcpServer(tools: DiagramTools): McpServer {
       },
     },
     async ({ id, source, target, label, blockId }) =>
-      ok(tools.addEdge(blockId, { id, source, target, label }))
+      toToolResult(tools.addEdge(blockId, { id, source, target, label }))
   );
 
   server.registerTool(
@@ -110,7 +110,7 @@ export function createMcpServer(tools: DiagramTools): McpServer {
     async ({ nodeId, label, x, y, annotation, blockId }) => {
       const position =
         x !== undefined && y !== undefined ? { x, y } : undefined;
-      return ok(
+      return toToolResult(
         tools.updateNode(blockId, nodeId, { label, position, annotation })
       );
     }
@@ -126,7 +126,7 @@ export function createMcpServer(tools: DiagramTools): McpServer {
         blockId,
       },
     },
-    async ({ nodeId, blockId }) => ok(tools.removeNode(blockId, nodeId))
+    async ({ nodeId, blockId }) => toToolResult(tools.removeNode(blockId, nodeId))
   );
 
   return server;
