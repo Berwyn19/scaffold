@@ -18,15 +18,17 @@ working:
   works before investing in anything real. If this doesn't feel good, better to
   know now.
 
-## Phase 1 — Real MCP server + minimal tool set
+## Phase 1 — Real MCP server + minimal tool set ✅
 
-- Set up an actual MCP server using the TypeScript SDK, exposing `add_node`,
-  `add_edge`, `get_diagram`.
-- Wire it into Claude Code as a local MCP connection (not yet the `/plan` slash
-  command — test it manually first via Claude Code's MCP config).
-- Storage: `plan.json` on disk, MCP server reads/writes it directly.
-- Test: ask Claude Code "add three boxes representing a login flow" and confirm
-  `plan.json` gets correct, sane data.
+Done. See [`phase-1-mcp.md`](./phase-1-mcp.md).
+
+- MCP server via the TypeScript SDK exposing `get_diagram`, `add_node`,
+  `add_edge`, `update_node`, `remove_node`, backed by `FileStore` +
+  `core/operations`.
+- Wired into Claude Code via project-scoped `.mcp.json` (stdio transport).
+- Storage: `plan.json` on disk.
+- Verified end to end with a stdio MCP client: tools list, nodes/edges apply and
+  persist.
 
 ## Phase 2 — Real canvas with React Flow
 

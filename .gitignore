@@ -2,5 +2,9 @@ node_modules/
 dist/
 *.log
 
+# Editor swap files
+*.swp
+*.swo
+
 # Local document store (the source-of-truth doc at rest)
 plan.json

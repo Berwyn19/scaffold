@@ -94,7 +94,7 @@ Block =
   | { id, type: 'text',    content }
   | { id, type: 'diagram', nodes, edges }          // shape matches React Flow
 
-DiagramNode = { id, position: {x,y}, data: { label, annotation? } }
+DiagramNode = { id, position: {x,y}, size?: {width,height}, data: { label, annotation? } }
 DiagramEdge = { id, source, target, label? }
 ```
 
@@ -102,9 +102,12 @@ DiagramEdge = { id, source, target, label? }
 
 ```bash
 npm install
-npm run dev:server   # starts the MCP + websocket process (ws://localhost:3001)
+npm run mcp          # runs the MCP server over stdio (what Claude Code spawns)
 npm run typecheck
 ```
+
+Claude Code picks up the server automatically via the project-scoped `.mcp.json`.
+See [`docs/phase-1-mcp.md`](./docs/phase-1-mcp.md) for how to try it.
 
 `npm run dev:web` (the React Flow canvas) comes online in Phase 2.
 

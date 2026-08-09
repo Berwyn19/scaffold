@@ -8,6 +8,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { Document } from "@core/types.js";
 import { applyOp, type Op } from "@core/operations.js";
 import type { Store } from "./Store.js";
+import { createDefaultDocument } from "./seed.js";
 
 export class FileStore implements Store {
   private doc: Document;
@@ -15,7 +16,7 @@ export class FileStore implements Store {
   constructor(private readonly path: string) {
     this.doc = existsSync(path)
       ? (JSON.parse(readFileSync(path, "utf8")) as Document)
-      : { id: "root", blocks: [] };
+      : createDefaultDocument();
   }
 
   get(): Document {

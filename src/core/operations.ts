@@ -33,6 +33,7 @@ export type Op =
 // common cases, so they get merged shallowly onto the existing node.
 export interface NodePatch {
   position?: { x: number; y: number };
+  size?: { width: number; height: number };
   label?: string;
   annotation?: string;
 }
@@ -100,6 +101,7 @@ function applyNodePatch(node: DiagramNode, patch: NodePatch): DiagramNode {
   return {
     ...node,
     position: patch.position ?? node.position,
+    size: patch.size ?? node.size,
     data: {
       ...node.data,
       label: patch.label ?? node.data.label,
